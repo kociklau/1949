@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 import os
 import sys
 
-fpath = os.path.dirname(os.path.abspath(__file__)) + "\\..\\benchmark\\benchmark\\experiment_results.dat"
+fpath = os.path.dirname(os.path.abspath(__file__)) + "/../benchmark/experiment_results.dat"
 index_array= []
 tvalue_array = []
 threshold_array=[]
@@ -22,7 +22,7 @@ with open(fpath, "r") as f:
     print("array size= {0}".format(N))
     #Get stride
     s = f.readline().split("=")[1]
-    print("threshold = {0}".format(s))
+    print("stride = {0}".format(s))
     #Get number of iterations
     numIter = f.readline().split("=")[1]
     print("numIterations = {0}".format(numIter))
