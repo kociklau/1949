@@ -264,9 +264,9 @@ endif
 
 ################################################################################
 
-#BUILD_FILE=benchmark.cu
+BUILD_FILE=benchmark.cu
 #BUILD_FILE=throughput.cu
-BUILD_FILE=integer.cu
+#BUILD_FILE=integer.cu
 
 # Target rules
 all: build
