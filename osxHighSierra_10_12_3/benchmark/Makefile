@@ -209,6 +209,7 @@ endif
 #Enable global memory caching on Maxwell device
 #CACHE ON == these flags below are added
 #CACHE OFF == these flags below are omitted
+#-ptx generates an assembly dump
 NVCCFLAGS += -Xptxas -dlcm=ca
 #############################################
 
@@ -265,8 +266,9 @@ endif
 ################################################################################
 
 BUILD_FILE=benchmark.cu
-#BUILD_FILE=throughput.cu
+#BUILD_FILE=overhead.cu
 #BUILD_FILE=integer.cu
+#BUILD_FILE=float.cu
 
 # Target rules
 all: build

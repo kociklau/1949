@@ -1,4 +1,3 @@
-
 #include "cuda_runtime.h"
 #include "device_launch_parameters.h"
 #include <iostream>
@@ -16,80 +15,31 @@
 
 using namespace std;
 
-__global__ void bench_Overhead(int *A, unsigned int d_tvalue){
-    __shared__ s_tvalue;
-    clock_t start_time = clock();
-    s_tvalue = A[0];
-    clock_t end_time = clock();
-    s_tvalue = end_time - start_time;
-    d_tvalue = s_tvalue;
-}
-
-__global__ void bench_LineSize(unsigned int *CUDA_A, unsigned int device_tvalue[], unsigned int device_index[]) {
-	//Placing variables in shared memory makes them
-	//not interfere with the global memory cache and, hence, the experiment
-	__shared__ unsigned int s_tvalue[iterations];
-	__shared__ unsigned int s_index[iterations];
-	//__shared__ unsigned int s_tvalue[iterations];
-	//__shared__ unsigned int s_index[iterations];
-	//__shared__ int j;
-    int j;
-	j = 0;
-	for (int it = 0; it < iterations; it++) {
-		clock_t start_time = clock();
-		j = CUDA_A[j];
-		//Store the element index
-		//Also generates memory dependence on previous
-		//instruction, so that clock() happens after the
-		//array access above
-		s_index[it] = j;
-		clock_t end_time = clock();
-		//store the access latency
-		s_tvalue[it] = end_time - start_time;
-	}
-	//All threads in this block have to reach this point
-	//before continuing execution.
-	__syncthreads();
-
-	//Transfer results from shared memory to global memory
-	//Later we will memcpy() the device global memory to host
-	for (int i = 0; i < iterations; i++) {
-		device_index[i] = s_index[i];
-		device_tvalue[i] = s_tvalue[i];
-	}
-
-}
-
-__global__ void bench_Integer(unsigned int*A, unsigned int d_tvalue){
-    /*
-    *   This function finds the cache line size b.
-    */
+__global__ void bench_Integer(unsigned int*A, unsigned int d_tvalue[]){
     __shared__ unsigned int s_tvalue;
-    __shared__ int          dummy;
     __shared__ int          result;
-    __syncthreads();//If more than 1 thread, all start at same time.
-    dummy = A[0];//loader
+    result = A[0];//loader -- cold cache miss, load cache line from mem
     clock_t start_time = clock();
-    result = A[1]+A[2];//int1+int2 , each a cache hit.
-    dummy = result;
+    result = A[1]*A[2];//cache hit.
+    result = result; //Same as bench_Overhead
     clock_t end_time = clock();
-    d_tvalue = end_time - start_time; 
-
+    s_tvalue = end_time - start_time; 
+    d_tvalue[0] = s_tvalue;
 }
 
 int main()
 {
-	printf("Will go through [%d] iterations with array of size N = [%d].\n", iterations, N);
-	FILE * file;
 	unsigned int *A = new unsigned int[3]; 
-    unsigned int *h_tvalue = 0;
+    unsigned int *h_tvalue = new unsigned int[1];
+    const int iterations = 1000;
+    unsigned int *avg_tval = new unsigned int[iterations];
 	//Initialize array
     A[0] = 0x00;
     A[1] = 0x01;
-    A[2] = 0x02;
+    A[2] = 0x03;
    
     unsigned int *CUDA_A = new unsigned int[3];
-    unsigned int *d_tvalue = 0;
+    unsigned int *d_tvalue = new unsigned int[1];
 
     cudaError_t cudaStatus;
 	// Choose which GPU to run on, change this on a multi-GPU system.
@@ -121,7 +71,7 @@ int main()
 		return -1;
 	}
 
-    bench_Overhead<<<1,1>>>(CUDA_A, d_tvalue)
+    bench_Integer<<<1,1>>>(CUDA_A, d_tvalue);
 
 	// Check for any errors launching the kernel
 	cudaStatus = cudaGetLastError();
@@ -145,7 +95,7 @@ int main()
 		return -1;
 	}
 
-    printf("overhead = %d\n",h_tvalue);
+    printf("Integer addition tvalue = %d\n",h_tvalue[0]);
 
     // cudaDeviceReset must be called before exiting in order for profiling and
     // tracing tools such as Nsight and Visual Profiler to show complete traces.
@@ -158,7 +108,3 @@ int main()
 }
 
 
-void newBenchmark(){
-
-
-}

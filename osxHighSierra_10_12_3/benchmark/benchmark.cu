@@ -1,4 +1,3 @@
-
 #include "cuda_runtime.h"
 #include "device_launch_parameters.h"
 #include <iostream>
@@ -20,7 +19,7 @@ const int C = 6144;
 //const int b = 8;//To cause misses.
 const int b = 0;//For no misses.
 //const int N = C+b+1; //24580 bytes = 24KB + 4B in binary => first miss
-const int N = C+(b*5);
+const int N = 9*8 + C+(b*5);
 //const int N = 6144; //24576 bytes = 24KB => no miss => C = 6144
 //const int N = 6000; //24000 bytes = 24KB in decimal => no miss
 const int s = 8;//s = 128*4 bytes
@@ -75,12 +74,6 @@ __global__ void bench_CacheAccess(unsigned int *CUDA_A, unsigned int device_tval
 		device_tvalue[i] = s_tvalue[i];
 	}
 
-}
-
-__global__ void bench_SingleOp(){
-    /*
-    *   This function benchmarks a single integer operation.
-    */
 }
 
 int main()

@@ -48,11 +48,11 @@ ax.text(0.65, 0.70, 'N = {0}stride = {1}threshold = {2}numIterations\
 = {3}hits = {4} misses = {5}'.format(N,s,threshold,numIter,hits,misses),
         verticalalignment='bottom', horizontalalignment='left',
         transform=ax.transAxes,
-        color='green', fontsize=10)
+        color='green', fontsize=14)
 
 ax.plot(index_array, tvalue_array)
 #plt.plot(index_array, threshold_array)
 plt.title('tvalue vs access index')
-plt.ylabel('tvalues (ms)')
-plt.xlabel('array index (integer)')
+plt.ylabel('tvalues (clock cycles)')
+plt.xlabel('array index (integer elements)')
 plt.show()

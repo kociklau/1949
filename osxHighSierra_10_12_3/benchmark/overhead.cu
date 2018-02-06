@@ -27,23 +27,6 @@ __global__ void bench_Overhead(unsigned int *A, unsigned int d_tvalue[]){
     d_tvalue[0] = s_tvalue[0];
 }
 
-__global__ void bench_Integer(unsigned int*A, unsigned int d_tvalue[]){
-    /*
-    *   This function finds the cache line size b.
-    */
-    __shared__ unsigned int s_tvalue;
-    __shared__ int          dummy;
-    __shared__ int          result;
-    __syncthreads();//If more than 1 thread, all start at same time.
-    dummy = A[0];//loader
-    clock_t start_time = clock();
-    result = A[1]+A[2];//int1+int2 , each a cache hit.
-    dummy = result;
-    clock_t end_time = clock();
-    s_tvalue = end_time - start_time; 
-    d_tvalue[0] = s_tvalue;
-}
-
 int main()
 {
 	unsigned int *A = new unsigned int[3]; 
@@ -114,11 +97,11 @@ int main()
 	    	return -1;
 	    }
 
-        printf("overhead = %d\n",h_tvalue[0]);
+        //printf("overhead = %d\n",h_tvalue[0]);
         avg_tval[i] = h_tvalue[0];
     }
 
-    Print average of all integer accesses
+    //Print average of all integer accesses
     int sum = 0;
     for (int i=0; i<iterations; i++){
         sum = sum + avg_tval[i];
@@ -136,8 +119,3 @@ int main()
     return 0;
 }
 
-
-void newBenchmark(){
-
-
-}
