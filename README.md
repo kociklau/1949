@@ -1,2 +1,2 @@
-# APS490Y1_2017
+# 1949
 Benchmarking code for Apache Spark.
